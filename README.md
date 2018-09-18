@@ -1,10 +1,10 @@
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/1ea91387fdc649518b8cf09f822268c9)](https://www.codacy.com/app/ThiagoBarradas/nancy-serilog?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=ThiagoBarradas/nancy-serilog&amp;utm_campaign=Badge_Grade)
 [![Build status](https://ci.appveyor.com/api/projects/status/p90493e09f7qe5ou/branch/master?svg=true)](https://ci.appveyor.com/project/ThiagoBarradas/nancy-serilog/branch/master)
 [![codecov](https://codecov.io/gh/ThiagoBarradas/nancy-serilog/branch/master/graph/badge.svg)](https://codecov.io/gh/ThiagoBarradas/nancy-serilog)
-[![NuGet Downloads](https://img.shields.io/nuget/dt/Nancy.Serilog.svg)](https://www.nuget.org/packages/Nancy.Serilog/)
-[![NuGet Version](https://img.shields.io/nuget/v/Nancy.Serilog.svg)](https://www.nuget.org/packages/Nancy.Serilog/)
+[![NuGet Downloads](https://img.shields.io/nuget/dt/Nancy.Serilog.Simple.svg)](https://www.nuget.org/packages/Nancy.Serilog.Simple/)
+[![NuGet Version](https://img.shields.io/nuget/v/Nancy.Serilog.Simple.svg)](https://www.nuget.org/packages/Nancy.Serilog.Simple/)
 
-# Nancy.Serilog
+# Nancy.Serilog.Simple
 
 Serilog logger for Nancy web applications. Handler request, response and exceptions.
 
@@ -71,7 +71,7 @@ You can use this propeties with serilog log context to build log messages. `HTTP
 ## Install via NuGet
 
 ```
-PM> Install-Package Nancy.Serilog
+PM> Install-Package Nancy.Serilog.Simple
 ```
 
 ## How can I contribute?
@@ -81,7 +81,7 @@ Please, refer to [CONTRIBUTING](.github/CONTRIBUTING.md)
 Open a new Issue following our issue template [ISSUE_TEMPLATE](.github/ISSUE_TEMPLATE.md)
 
 ## Changelog
-See in [nuget version history](https://www.nuget.org/packages/Nancy.Serilog)
+See in [nuget version history](https://www.nuget.org/packages/Nancy.Serilog.Simple)
 
 ## Did you like it? Please, make a donate :)
 

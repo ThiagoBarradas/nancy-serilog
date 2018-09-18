@@ -2,7 +2,7 @@
 using Serilog;
 using System;
 
-namespace Nancy.Serilog
+namespace Nancy.Serilog.Simple
 {
     /// <summary>
     /// Communication Logger interface

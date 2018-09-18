@@ -18,7 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Nancy.Serilog\Nancy.Serilog.csproj" />
+    <ProjectReference Include="..\Nancy.Serilog.Simple\Nancy.Serilog.Simple.csproj" />
   </ItemGroup>
 
 </Project>

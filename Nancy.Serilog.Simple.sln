@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27703.2026
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nancy.Serilog", "Nancy.Serilog\Nancy.Serilog.csproj", "{86B6EA2E-A392-4EE5-9B0A-5D0613BD5EEB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nancy.Serilog.Simple", "Nancy.Serilog.Simple\Nancy.Serilog.Simple.csproj", "{86B6EA2E-A392-4EE5-9B0A-5D0613BD5EEB}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nancy.Serilog.Tests", "Nancy.Serilog.Tests\Nancy.Serilog.Tests.csproj", "{19CC86E9-6988-4192-A935-90B4DC12CD83}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nancy.Serilog.Simple.Tests", "Nancy.Serilog.Simple.Tests\Nancy.Serilog.Simple.Tests.csproj", "{19CC86E9-6988-4192-A935-90B4DC12CD83}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solutiom Items", "Solutiom Items", "{EB79A226-EDC7-455E-8382-B9546B988ECB}"
 	ProjectSection(SolutionItems) = preProject

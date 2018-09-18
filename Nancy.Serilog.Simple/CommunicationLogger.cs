@@ -10,7 +10,7 @@ using System;
 using System.IO;
 using System.Linq;
 
-namespace Nancy.Serilog
+namespace Nancy.Serilog.Simple
 {
     /// <summary>
     /// Communication Logger implementation

@@ -1,7 +1,7 @@
 ﻿
 using Serilog;
 
-namespace Nancy.Serilog
+namespace Nancy.Serilog.Simple
 {
     public class NancySerilogConfiguration
     {

@@ -10,7 +10,7 @@ using Xunit;
 using Xunit.Abstractions;
 using Xunit.Sdk;
 
-namespace Nancy.Serilog.Tests
+namespace Nancy.Serilog.Simple.Tests
 {
     public class CommunicationLoggerTest
     {
@@ -23,7 +23,7 @@ namespace Nancy.Serilog.Tests
             Log.Logger = new LoggerConfiguration()
                 .WriteTo.XunitTestOutput(this.TestOutputHelper)
                 .Enrich.FromLogContext()
-                .Enrich.WithProperty("Domain", "Nancy.Serilog")
+                .Enrich.WithProperty("Domain", "Nancy.Serilog.Simple")
                 .Enrich.WithProperty("Application", "CommunicationLogger")
                 .CreateLogger();
         }

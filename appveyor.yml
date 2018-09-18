@@ -22,20 +22,20 @@ before_build:
   - dotnet restore
 
 build:
-  project: Nancy.Serilog.sln
+  project: Nancy.Serilog.Simple.sln
 
 test_script:
-  - OpenCover.Console.exe -oldstyle -register:user -target:"C:/Program Files/dotnet/dotnet.exe" -targetargs:"test --logger:trx;LogFileName=results.trx /p:DebugType=full Nancy.Serilog.Tests\Nancy.Serilog.Tests.csproj" -filter:"+[Nancy.Serilog*]* -[Nancy.Serilog.Tests*]*" -output:".\coverage.xml"
+  - OpenCover.Console.exe -oldstyle -register:user -target:"C:/Program Files/dotnet/dotnet.exe" -targetargs:"test --logger:trx;LogFileName=results.trx /p:DebugType=full Nancy.Serilog.Simple.Tests\Nancy.Serilog.Simple.Tests.csproj" -filter:"+[Nancy.Serilog.Simple*]* -[Nancy.Serilog.Simple.Tests*]*" -output:".\coverage.xml"
   - codecov -f .\coverage.xml -t %CODECOV_TOKEN%
 
 after_test:
   - dotnet pack --configuration Release /p:Version=%version%
 
 artifacts:
-  - path: Nancy.Serilog\bin\Release\netstandard2.0\Nancy.Serilog.dll
-    name: Nancy.Serilog.dll
-  - path: Nancy.Serilog\bin\Release\Nancy.Serilog.%version%.nupkg
-    name: Nancy.Serilog.%version%.nupkg
+  - path: Nancy.Serilog.Simple\bin\Release\netstandard2.0\Nancy.Serilog.Simple.dll
+    name: Nancy.Serilog.Simple.dll
+  - path: Nancy.Serilog.Simple\bin\Release\Nancy.Serilog.Simple.%version%.nupkg
+    name: Nancy.Serilog.Simple.%version%.nupkg
 
 deploy:
   provider: NuGet
