@@ -1,0 +1,43 @@
+image: Visual Studio 2017
+platform: Any CPU
+
+environment:
+  version: $(APPVEYOR_BUILD_VERSION)
+
+configuration:
+- Release
+
+dotnet_csproj:
+  patch: true
+  file: '**\*.csproj'
+  version: '%version%'
+  package_version: '%version%'
+  assembly_version: '%version%'
+  file_version: '%version%'
+  informational_version: '%version%'
+
+before_build:
+  - choco install opencover.portable
+  - choco install codecov
+  - dotnet restore
+
+build:
+  project: Nancy.Serilog.sln
+
+test_script:
+  - OpenCover.Console.exe -oldstyle -register:user -target:"C:/Program Files/dotnet/dotnet.exe" -targetargs:"test --logger:trx;LogFileName=results.trx /p:DebugType=full Nancy.Serilog.Tests\Nancy.Serilog.Tests.csproj" -filter:"+[Nancy.Serilog*]* -[Nancy.Serilog.Tests*]*" -output:".\coverage.xml"
+  - codecov -f .\coverage.xml -t %CODECOV_TOKEN%
+
+after_test:
+  - dotnet pack --configuration Release /p:Version=%version%
+
+artifacts:
+  - path: Nancy.Serilog\bin\Release\netstandard2.0\Nancy.Serilog.dll
+    name: Nancy.Serilog.dll
+  - path: Nancy.Serilog\bin\Release\Nancy.Serilog.%version%.nupkg
+    name: Nancy.Serilog.%version%.nupkg
+
+deploy:
+  provider: NuGet
+  api_key:
+    secure: hb5jOmzsvUKCtOP41EFtc/lwXAOh5auC5KAi2Ok9i/FmTuo2F36yzEgaPiT9olsB

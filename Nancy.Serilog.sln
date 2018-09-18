@@ -1,0 +1,43 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27703.2026
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nancy.Serilog", "Nancy.Serilog\Nancy.Serilog.csproj", "{86B6EA2E-A392-4EE5-9B0A-5D0613BD5EEB}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nancy.Serilog.Tests", "Nancy.Serilog.Tests\Nancy.Serilog.Tests.csproj", "{19CC86E9-6988-4192-A935-90B4DC12CD83}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solutiom Items", "Solutiom Items", "{EB79A226-EDC7-455E-8382-B9546B988ECB}"
+	ProjectSection(SolutionItems) = preProject
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
+		appveyor.yml = appveyor.yml
+		.github\CONTRIBUTING.md = .github\CONTRIBUTING.md
+		.github\ISSUE_TEMPLATE.md = .github\ISSUE_TEMPLATE.md
+		LICENSE = LICENSE
+		.github\PULL_REQUEST_TEMPLATE.md = .github\PULL_REQUEST_TEMPLATE.md
+		README.md = README.md
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{86B6EA2E-A392-4EE5-9B0A-5D0613BD5EEB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{86B6EA2E-A392-4EE5-9B0A-5D0613BD5EEB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{86B6EA2E-A392-4EE5-9B0A-5D0613BD5EEB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{86B6EA2E-A392-4EE5-9B0A-5D0613BD5EEB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{19CC86E9-6988-4192-A935-90B4DC12CD83}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{19CC86E9-6988-4192-A935-90B4DC12CD83}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{19CC86E9-6988-4192-A935-90B4DC12CD83}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{19CC86E9-6988-4192-A935-90B4DC12CD83}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2A2EB7D9-A885-4283-864B-5CE0B2DB6A98}
+	EndGlobalSection
+EndGlobal
