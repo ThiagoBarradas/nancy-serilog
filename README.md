@@ -27,14 +27,14 @@ Resolve dependency and setup pipelines
 
 protected override void ConfigureApplicationContainer(TinyIoCContainer container)
 {
-	container.Register<ICommunicationLogger, CommunicationLogger>().AsSingleton();
+    container.Register<ICommunicationLogger, CommunicationLogger>().AsSingleton();
     base.ConfigureApplicationContainer(container);
 }
 
 protected override void ApplicationStartup(TinyIoCContainer container, IPipelines pipelines)
 {
     var logger = container.Resolve<ICommunicationLogger>();
-	logger.ConfigurePipelines(pipelines);
+    logger.ConfigurePipelines(pipelines);
 }
 
 ```
