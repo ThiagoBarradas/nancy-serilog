@@ -31,7 +31,7 @@ namespace Nancy.Serilog.Simple.Tests
                 .Enrich.WithProperty("Application", "CommunicationLogger")
                 .MinimumLevel.Verbose()
                 .WriteTo.XunitTestOutput(this.TestOutputHelper)
-                .WriteTo.Seq("http://localhost:5341")
+                //.WriteTo.Seq("http://localhost:5341")
                 .CreateLogger();
 
             LoggerDebug.SelfLog.Enable(msg => Debug.WriteLine(msg));
