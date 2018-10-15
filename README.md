@@ -27,14 +27,21 @@ Resolve dependency and setup pipelines
 
 protected override void ConfigureApplicationContainer(TinyIoCContainer container)
 {
+    var jsonSerializerSettings = new JsonSerializerSettings
+    {
+    	ContractResolver = new CamelCasePropertyNamesContractResolver()
+    };
+
+    container.Register<JsonSerializerSettings>(jsonSerializerSettings);
     container.Register<ICommunicationLogger, CommunicationLogger>().AsSingleton();
+    
     base.ConfigureApplicationContainer(container);
 }
 
 protected override void ApplicationStartup(TinyIoCContainer container, IPipelines pipelines)
 {
 	// you must setup logger pipeline in application startup
-	pipelines.AddLogPipeline(container); 
+	pipelines.AddLogPipelines(container); 
 }
 
 ```
