@@ -1,14 +1,17 @@
 using Moq;
 using Nancy.Bootstrapper;
+using Nancy.Serilog.Simple.Extensions;
+using Nancy.Serilog.Simple.Tests.Mock;
+using Nancy.TinyIoc;
 using Serilog;
 using System;
 using System.Collections.Generic;
-using System.IO;
+using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using Xunit;
 using Xunit.Abstractions;
 using Xunit.Sdk;
+using LoggerDebug = Serilog.Debugging;
 
 namespace Nancy.Serilog.Simple.Tests
 {
@@ -21,11 +24,17 @@ namespace Nancy.Serilog.Simple.Tests
             this.TestOutputHelper = testOutputHelper as TestOutputHelper;
 
             Log.Logger = new LoggerConfiguration()
-                .WriteTo.XunitTestOutput(this.TestOutputHelper)
                 .Enrich.FromLogContext()
+                .Enrich.WithEnvironmentUserName()
+                .Enrich.WithMachineName()
                 .Enrich.WithProperty("Domain", "Nancy.Serilog.Simple")
                 .Enrich.WithProperty("Application", "CommunicationLogger")
+                .MinimumLevel.Verbose()
+                .WriteTo.XunitTestOutput(this.TestOutputHelper)
+                .WriteTo.Seq("http://localhost:5341")
                 .CreateLogger();
+
+            LoggerDebug.SelfLog.Enable(msg => Debug.WriteLine(msg));
         }
 
         [Fact]
@@ -89,54 +98,7 @@ namespace Nancy.Serilog.Simple.Tests
             Assert.Null(logger.NancySerilogConfiguration.InformationTitle);
             Assert.NotNull(logger.NancySerilogConfiguration.Logger);
         }
-
-        [Fact]
-        public void ConfigurePipelines_Should_Throws_Exception_When_Pipelines_Is_Null()
-        {
-            // arrange
-            var logger = new CommunicationLogger();
-
-            // act
-            Exception ex = Assert.Throws<ArgumentNullException>(() =>
-                logger.ConfigurePipelines(null));
-
-            // assert
-            Assert.Equal("Value cannot be null.\r\nParameter name: pipelines", ex.Message);
-        }
-
-        [Fact]
-        public void ConfigurePipelines_Should_Define_Error_And_AfterRequest_Pipelines()
-        {
-            // arrange
-            var logger = new CommunicationLogger();
-
-            var afterPipeline = new AfterPipeline();
-            var errorPipeline = new ErrorPipeline();
-            var beforePipeline = new BeforePipeline();
-            var pipelinesMock = new Mock<IPipelines>();
-
-            pipelinesMock
-                .Setup(m => m.AfterRequest)
-                .Returns(afterPipeline);
-            pipelinesMock
-                .Setup(m => m.OnError)
-                .Returns(errorPipeline);
-            pipelinesMock
-                .Setup(m => m.BeforeRequest)
-                .Returns(beforePipeline);
-
-            IPipelines pipelines = pipelinesMock.Object;
-
-
-            // act
-            logger.ConfigurePipelines(pipelines);
-
-            // assert
-            Assert.NotEmpty(afterPipeline.PipelineItems);
-            Assert.NotEmpty(errorPipeline.PipelineItems);
-            Assert.Empty(beforePipeline.PipelineItems);
-        }
-
+        
         [Fact]
         public void LogData_Should_Throws_Exception_When_Context_Is_Null()
         {
@@ -176,14 +138,14 @@ namespace Nancy.Serilog.Simple.Tests
             var responseStatusCode = HttpStatusCode.Created;
             var Content = "{ \"xpto\" : \"test\" }";
 
-            var context = this.GetNancyContext(
+            var context = NancyContextMock.Create(
                 requestMethod, requestUrl, requestBody, requestHeaders,
                 responseStatusCode, Content, responseHeaders,
                 originIp, protocolVersion);
 
             var config = new NancySerilogConfiguration
             {
-                InformationTitle = "{Method} | {Body} | [{Path}] | {RequestHeaders} | {Ip} | {StatusCode} | {StatusCodeFamily} | {ErrorException} | {Content} | {ResponseHeaders} | {ElapsedMilliseconds}"
+                InformationTitle = "{Method} | {Ip} | {StatusCode} | {StatusCodeFamily} | {ErrorException} | {ElapsedMilliseconds}"
             };
             var logger = new CommunicationLogger(config);
 
@@ -191,7 +153,50 @@ namespace Nancy.Serilog.Simple.Tests
             logger.LogData(context);
 
             // assert
-            Assert.Contains("[Information] \"POST\" | \"{ \\\"test\\\" : \\\"123\\\" }\" | [\"/test\"] | \"{\r\n  \\\"X-Forwarded-For\\\": \\\"226.225.223.224\\\",\r\n  \\\"Content-Type\\\": \\\"application/json\\\",\r\n  \\\"Accept\\\": \\\"application/json,text/xml\\\"\r\n}\" | \"226.225.223.224\" | 201 | \"2XX\" | null | \"{ \\\"xpto\\\" : \\\"test\\\" }\" | \"{\r\n  \\\"Content-Type\\\": \\\"application/json\\\",\r\n  \\\"X-Internal-Time\\\": \\\"100\\\"\r\n}\" | 100", this.TestOutputHelper.Output);
+            Assert.Contains("[Information] \"POST\" | \"226.225.223.224\" | 201 | \"2XX\" | null | 100", this.TestOutputHelper.Output);
+        }
+
+        [Fact]
+        public void LogData_Should_Work_With_X_Www_Url_Form_Encoded()
+        {
+            // arrange
+            var originIp = "127.0.0.1";
+            var protocolVersion = "1.1";
+
+            var requestMethod = "POST";
+            var requestBody = "someproperty=somevalue&somep1=somevalue1&somep1=somevalue2";
+            var requestUrl = "http://localhost/test";
+            var requestHeaders = new Dictionary<string, IEnumerable<string>>
+            {
+                {  "X-Forwarded-For", new string[] { "226.225.223.224" } },
+                {  "Content-Type", new string[] { "application/x-www-form-urlencoded" } },
+                {  "Accept", new string[] { "application/json", "text/xml" } }
+            };
+
+            var responseHeaders = new Dictionary<string, string>
+            {
+                {  "Content-Type", "application/json" },
+                {  "X-Internal-Time", "100" }
+            };
+            var responseStatusCode = HttpStatusCode.Created;
+            var Content = "{ \"xpto\" : \"test\" }";
+
+            var context = NancyContextMock.Create(
+                requestMethod, requestUrl, requestBody, requestHeaders,
+                responseStatusCode, Content, responseHeaders,
+                originIp, protocolVersion);
+
+            var config = new NancySerilogConfiguration
+            {
+                InformationTitle = "XWWW {Method} | {Ip} | {StatusCode} | {StatusCodeFamily} | {ErrorException} | {ElapsedMilliseconds}"
+            };
+            var logger = new CommunicationLogger(config);
+
+            // act
+            logger.LogData(context);
+
+            // assert
+            Assert.Contains("[Information] XWWW \"POST\" | \"226.225.223.224\" | 201 | \"2XX\" | null | 100", this.TestOutputHelper.Output);
         }
 
         [Fact]
@@ -203,7 +208,7 @@ namespace Nancy.Serilog.Simple.Tests
 
             var requestMethod = "POST";
             var requestBody = "{ \"test\" : \"123\", \"test2\" : \"123\" }";
-            var requestUrl = "http://localhost/test";
+            var requestUrl = "http://localhost/test?query1=xpto1&query1=xpto2&query2=1&query3=";
             var requestHeaders = new Dictionary<string, IEnumerable<string>>
             {
                 {  "Content-Type", new string[] { "application/json" } },
@@ -217,23 +222,33 @@ namespace Nancy.Serilog.Simple.Tests
             var responseStatusCode = HttpStatusCode.BadRequest;
             var Content = "{ \"xpto\" : \"test\" }";
 
-            var context = this.GetNancyContext(
+            var context = NancyContextMock.Create(
                 requestMethod, requestUrl, requestBody, requestHeaders,
                 responseStatusCode, Content, responseHeaders,
                 originIp, protocolVersion);
+            context.Items["test"] = "test";
 
             var config = new NancySerilogConfiguration
             {
-                InformationTitle = "{Method} | {Body} | {Query} | {Host} | {Path} | {RequestHeaders} | {Ip} | {IsSuccessful} | {ProtocolVersion} | {StatusCode} | {StatusDescription} | {StatusCodeFamily} | {ErrorException} | {Content} | {ResponseHeaders} | {ElapsedMilliseconds}",
-                Blacklist = new string[] { "test" }
+                InformationTitle = "{Method} | {Host} | {Path} | {Ip} | {IsSuccessful} | {ProtocolVersion} | {StatusCode} | {StatusDescription} | {StatusCodeFamily} | {ElapsedMilliseconds}",
+                Blacklist = new string[] { "test" },
+                Logger = Log.Logger
             };
+
             var logger = new CommunicationLogger(config);
+            IPipelines pipelines = new Pipelines();
+            TinyIoCContainer container = new TinyIoCContainer();
+
+            container.Register<ICommunicationLogger>(logger);
+            container.Register(PackUtils.JsonUtility.CamelCaseJsonSerializerSettings);
+
+            pipelines.AddLogPipelines(container);
 
             // act
             logger.LogData(context);
 
             // assert
-            Assert.Contains("[Information] \"POST\" | \"{\r\n  \\\"test\\\": \\\"******\\\",\r\n  \\\"test2\\\": \\\"123\\\"\r\n}\" | \"\" | \"localhost\" | \"/test\" | \"{\r\n  \\\"Content-Type\\\": \\\"application/json\\\",\r\n  \\\"Accept\\\": \\\"application/json,text/xml\\\"\r\n}\" | \"127.0.0.1\" | False | \"1.1\" | 400 | \"BadRequest\" | \"4XX\" | null | \"{ \\\"xpto\\\" : \\\"test\\\" }\" | \"{\r\n  \\\"Content-Type\\\": \\\"application/json\\\"\r\n}\" | \"??\"", this.TestOutputHelper.Output);
+            Assert.Contains("[Information] \"POST\" | \"localhost\" | \"/test\" | \"127.0.0.1\" | False | \"1.1\" | 400 | \"BadRequest\" | \"4XX\" | \"??\"", this.TestOutputHelper.Output);
         }
 
         [Fact]
@@ -245,9 +260,10 @@ namespace Nancy.Serilog.Simple.Tests
 
             var requestMethod = "POST";
             var requestBody = "{ \"test\" : \"123\", \"test2\" : \"123\" }";
-            var requestUrl = "http://localhost/test";
+            var requestUrl = "http://localhost/test?query1=xpto1&query1=xpto2&query2=1&query3";
             var requestHeaders = new Dictionary<string, IEnumerable<string>>
             {
+                { "RequestKey", new string[] { Guid.NewGuid().ToString() }  },
                 {  "Content-Type", new string[] { "application/json" } },
                 {  "Accept", new string[] { "application/json", "text/xml" } }
             };
@@ -259,7 +275,7 @@ namespace Nancy.Serilog.Simple.Tests
             var responseStatusCode = HttpStatusCode.BadRequest;
             var Content = "{ \"xpto\" : \"test\" }";
 
-            var context = this.GetNancyContext(
+            var context = NancyContextMock.Create(
                 requestMethod, requestUrl, requestBody, requestHeaders,
                 responseStatusCode, Content, responseHeaders,
                 originIp, protocolVersion);
@@ -302,14 +318,14 @@ namespace Nancy.Serilog.Simple.Tests
 
             var exception = new ArgumentNullException("test");
 
-            var context = this.GetNancyContext(
+            var context = NancyContextMock.Create(
                 requestMethod, requestUrl, requestBody, requestHeaders,
                 responseStatusCode, Content, responseHeaders,
                 originIp, protocolVersion);
 
             var config = new NancySerilogConfiguration
             {
-                ErrorTitle = "{Method} | {Body} | [{Path}] | {RequestHeaders} | {Query} | {UrlBase} | {Ip} | {StatusCode} | {StatusCodeFamily} | {ErrorException} | {Content} | {ResponseHeaders} | {ElapsedMilliseconds}",
+                ErrorTitle = "{Method} | {Ip} | {StatusCode} | {StatusCodeFamily} | {ElapsedMilliseconds}",
             };
             var logger = new CommunicationLogger(config);
 
@@ -317,7 +333,7 @@ namespace Nancy.Serilog.Simple.Tests
             logger.LogData(context, exception);
 
             // assert
-            Assert.Contains("[Error] \"POST\" | \"{ \\\"test\\\" : \\\"123\\\" }\" | [\"/test\"] | \"{\r\n  \\\"Content-Type\\\": \\\"text/html\\\",\r\n  \\\"Accept\\\": \\\"text/html,text/xml\\\"\r\n}\" | \"?sometest=rrtt\" | \"http://some.thing.xp:80\" | \"??\" | 500 | \"5XX\" | \"System.ArgumentNullException: Value cannot be null.\r\nParameter name: test\" | \"\" | \"{\r\n  \\\"Content-Type\\\": \\\"text/html\\\"\r\n}\" | \"??\"", this.TestOutputHelper.Output);
+            Assert.Contains("[Error] \"POST\" | \"??\" | 500 | \"5XX\" | \"??\"", this.TestOutputHelper.Output);
         }
 
         [Fact]
@@ -345,7 +361,7 @@ namespace Nancy.Serilog.Simple.Tests
 
             var exception = new ArgumentNullException("test");
 
-            var context = this.GetNancyContext(
+            var context = NancyContextMock.Create(
                 requestMethod, requestUrl, requestBody, requestHeaders,
                 responseStatusCode, Content, responseHeaders,
                 originIp, protocolVersion);
@@ -359,26 +375,52 @@ namespace Nancy.Serilog.Simple.Tests
             Assert.Contains("[Error] HTTP \"POST\" \"/test\" from \"??\" responded 500 in \"??\" ms", this.TestOutputHelper.Output);
         }
 
-        private NancyContext GetNancyContext(string requestMethod, string requestUrl, string requestBody, Dictionary<string, IEnumerable<string>> requestHeaders, HttpStatusCode responseStatusCode, string Content, Dictionary<string, string> responseHeaders, string originIp, string protocolVersion)
+        [Fact]
+        public void DisableLog_Should_Works()
         {
-            MemoryStream requestBodyStream = (requestBody != null)
-                ? new MemoryStream(Encoding.ASCII.GetBytes(requestBody))
-                : null ; 
+            // arrange
+            string originIp = null;
+            var protocolVersion = "1.1";
 
-            MemoryStream ContentStream = (Content != null) 
-                ? new MemoryStream(Encoding.ASCII.GetBytes(Content))
-                : null ;
-
-            var request = new Request(requestMethod, new Url(requestUrl), requestBodyStream, requestHeaders, originIp, null, protocolVersion);
-            var response = (Response)Content;
-            response.StatusCode = responseStatusCode;
-            response.Headers = responseHeaders;
-
-            return new NancyContext
+            var requestMethod = "POST";
+            string requestBody = null;
+            var requestUrl = "http://some.thing.xp/log-disabled?sometest=rrtt";
+            var requestHeaders = new Dictionary<string, IEnumerable<string>>
             {
-                Request = request,
-                Response = response
+                {  "Content-Type", new string[] { "text/html" } },
+                {  "Accept", new string[] { "text/html", "text/xml" } }
             };
+
+            var responseHeaders = new Dictionary<string, string>
+            {
+                {  "Content-Type", "text/html" },
+            };
+            var responseStatusCode = HttpStatusCode.BadRequest;
+            string Content = null;
+
+            var context = NancyContextMock.Create(
+                requestMethod, requestUrl, requestBody, requestHeaders,
+                responseStatusCode, Content, responseHeaders,
+                originIp, protocolVersion);
+
+            var logger = new CommunicationLogger();
+
+            var module = new MyModule();
+            module.Context = context;
+            module.DisableLogging();
+
+            // act
+            logger.LogData(context);
+
+            // assert
+            Assert.DoesNotContain("log-disabled", this.TestOutputHelper.Output);
         }
+
+
+    }
+
+    public class MyModule : NancyModule
+    {
+
     }
 }

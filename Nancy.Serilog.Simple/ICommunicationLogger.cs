@@ -1,5 +1,5 @@
 ﻿using Nancy.Bootstrapper;
-using Serilog;
+using Nancy.TinyIoc;
 using System;
 
 namespace Nancy.Serilog.Simple
@@ -26,11 +26,5 @@ namespace Nancy.Serilog.Simple
         /// <param name="context"></param>
         /// <param name="exception"></param>
         void LogData(NancyContext context, Exception exception);
-
-        /// <summary>
-        /// Configure nancy pipeline
-        /// </summary>
-        /// <param name="pipelines"></param>
-        void ConfigurePipelines(IPipelines pipelines);
     }
 }

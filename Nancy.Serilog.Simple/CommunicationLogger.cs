@@ -1,14 +1,9 @@
-﻿using JsonMasking;
-using Nancy.Bootstrapper;
-using Nancy.Extensions;
-using Nancy.IO;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+﻿using Nancy.Serilog.Simple.Extensions;
+using Nancy.Serilog.Simple.Extractors;
+using Nancy.TinyIoc;
 using Serilog;
 using Serilog.Context;
 using System;
-using System.IO;
-using System.Linq;
 
 namespace Nancy.Serilog.Simple
 {
@@ -48,37 +43,17 @@ namespace Nancy.Serilog.Simple
         {
             this.SetupCommunicationLogger(null);
         }
-
-        /// <summary>
-        /// Configure nancy pipeline
-        /// </summary>
-        /// <param name="pipelines"></param>
-        public void ConfigurePipelines(IPipelines pipelines)
-        {
-            if (pipelines == null)
-            {
-                throw new ArgumentNullException(nameof(pipelines));
-            }
-
-            pipelines.OnError.AddItemToEndOfPipeline((context, exception) =>
-            {
-                this.LogData(context, exception);
-                return null;
-            });
-
-            pipelines.AfterRequest.AddItemToEndOfPipeline((context) =>
-            {
-                this.LogData(context);
-            });
-        }
-
+        
         /// <summary>
         /// Log context 
         /// </summary>
         /// <param name="context"></param>
         public void LogData(NancyContext context)
         {
-            this.LogData(context, null);
+            if (context?.Items == null || context.Items.TryGetValue(DisableLoggingExtension.ITEM_NAME, out object disableSerilog) == false)
+            {
+                this.LogData(context, null);
+            }
         }
 
         /// <summary>
@@ -93,28 +68,31 @@ namespace Nancy.Serilog.Simple
                 throw new ArgumentNullException(nameof(context));
             }
 
-            var statusCode = this.GetStatusCode(context, exception);
+            var statusCode = context.GetStatusCode(exception);
 
-            LogContext.PushProperty("Body", this.GetRequestBodyAsString(context));
+            LogContext.PushProperty("Body", context.GetRequestBody(this.NancySerilogConfiguration.Blacklist));
             LogContext.PushProperty("Method", context.Request.Method);
             LogContext.PushProperty("Path", context.Request.Path);
             LogContext.PushProperty("Host", context.Request.Url.HostName);
-            LogContext.PushProperty("UrlBase", context.Request.Url.SiteBase);
-            LogContext.PushProperty("Query", context.Request.Url.Query);
-            LogContext.PushProperty("RequestHeaders", this.GetRequestHeadersAsJson(context));
-            LogContext.PushProperty("Ip", this.GetIp(context));
+            LogContext.PushProperty("Port", context.Request.Url.Port);
+            LogContext.PushProperty("Url", context.Request.Url);
+            LogContext.PushProperty("QueryString", context.Request.Url.Query);
+            LogContext.PushProperty("Query", context.GetQueryString());
+            LogContext.PushProperty("RequestHeaders", context.GetRequestHeaders());
+            LogContext.PushProperty("Ip", context.GetIp());
             LogContext.PushProperty("IsSuccessful", statusCode < 400);
             LogContext.PushProperty("StatusCode", statusCode);
-            LogContext.PushProperty("StatusDescription", ((HttpStatusCode) statusCode).ToString());
-            LogContext.PushProperty("StatusCodeFamily", this.GetStatusCodeFamily(statusCode));
+            LogContext.PushProperty("StatusDescription", ((HttpStatusCode)statusCode).ToString());
+            LogContext.PushProperty("StatusCodeFamily", context.GetStatusCodeFamily(exception));
             LogContext.PushProperty("ProtocolVersion", context.Request.ProtocolVersion);
             LogContext.PushProperty("ErrorException", exception);
             LogContext.PushProperty("ErrorMessage", exception?.Message);
-            LogContext.PushProperty("Content", this.GetResponseAsString(context));
+            LogContext.PushProperty("Content", context.GetResponseContent());
             LogContext.PushProperty("ContentType", context.Response.ContentType);
-            LogContext.PushProperty("ContentLength", this.GetResponseLength(context));
-            LogContext.PushProperty("ResponseHeaders", this.GetResponsetHeadersAsJson(context));
-            LogContext.PushProperty("ElapsedMilliseconds", this.GetExecutionTime(context, exception));
+            LogContext.PushProperty("ContentLength", context.GetResponseLength());
+            LogContext.PushProperty("ResponseHeaders", context.GetResponseHeaders());
+            LogContext.PushProperty("ElapsedMilliseconds", context.GetExecutionTime());
+            LogContext.PushProperty("RequestKey", context.GetRequestKey());
 
             if (exception != null || statusCode >= 500)
             {
@@ -127,7 +105,7 @@ namespace Nancy.Serilog.Simple
                 this.NancySerilogConfiguration.Logger.Information(informationTitle);
             }
         }
-        
+
         /// <summary>
         /// Initialize instance
         /// </summary>
@@ -139,164 +117,6 @@ namespace Nancy.Serilog.Simple
 
             this.NancySerilogConfiguration.Logger =
                 configuration?.Logger ?? Log.Logger;
-        }
-
-        /// <summary>
-        /// Get status code
-        /// </summary>
-        /// <param name="context"></param>
-        /// <param name="exception"></param>
-        /// <returns></returns>
-        private int GetStatusCode(NancyContext context, Exception exception)
-        {
-            if (exception != null)
-            {
-                return 500;
-            }
-
-            var statusCode = (int)context.Response.StatusCode;
-            return statusCode;
-        }
-
-        /// <summary>
-        /// Get request body
-        /// </summary>
-        /// <param name="context"></param>
-        /// <returns></returns>
-        private string GetRequestBodyAsString(NancyContext context)
-        {
-            var body = RequestStream.FromStream(context.Request.Body).AsString();
-            var contentType = context.Request.Headers["Content-Type"].FirstOrDefault() ?? "";
-            var isJson = contentType.Contains("application/json");
-
-            if (isJson && this.NancySerilogConfiguration.Blacklist?.Any() == true)
-            {
-                return body.MaskFields(this.NancySerilogConfiguration.Blacklist, "******");
-            }
-
-            return body;
-        }
-
-        /// <summary>
-        /// Get ip (X-Forwarded-For or original)
-        /// </summary>
-        /// <param name="context"></param>
-        /// <returns></returns>
-        private string GetIp(NancyContext context)
-        {
-            string ip = context.Request.Headers["X-Forwarded-For"].FirstOrDefault()
-                        ?? context.Request.UserHostAddress;
-
-            return ip ?? "??";
-        }
-        
-        /// <summary>
-        /// Get status code family, like 1XX 2XX 3XX 4XX 5XX
-        /// </summary>
-        /// <param name="statusCode"></param>
-        /// <returns></returns>
-        private string GetStatusCodeFamily(int statusCode)
-        {
-            var family = statusCode.ToString()[0] + "XX";
-
-            return family;
-        }
-
-        /// <summary>
-        /// Get total execution time from X-Internal-Time header
-        /// </summary>
-        /// <param name="context"></param>
-        /// <param name="exception"></param>
-        /// <returns></returns>
-        private object GetExecutionTime(NancyContext context, Exception exception)
-        {
-            string elapsedDefault = "??";
-
-            if (exception != null)
-            {
-                return elapsedDefault;
-            }
-            
-            if (context.Response.Headers.TryGetValue("X-Internal-Time", out string elapsedParsed) == true)
-            {
-                if (Int64.TryParse(elapsedParsed, out long elapsedLong) == true)
-                {
-                    return elapsedLong;
-                }
-            }
-            
-            return elapsedDefault;
-        }
-
-        /// <summary>
-        /// Get all request headers as json
-        /// </summary>
-        /// <param name="context"></param>
-        /// <returns></returns>
-        private string GetRequestHeadersAsJson(NancyContext context)
-        {
-            var headers = new JObject();
-            foreach (var item in context.Request.Headers)
-            {
-                var value = item.Value.FirstOrDefault();
-
-                if (item.Value.Count() > 1)
-                {
-                    value = string.Join(",", item.Value);
-                }
-                
-                headers.Add(new JProperty(item.Key, value));
-            }
-            return JsonConvert.SerializeObject(headers, Formatting.Indented);
-        }
-
-        /// <summary>
-        /// Get all response headers as json
-        /// </summary>
-        /// <param name="context"></param>
-        /// <returns></returns>
-        private string GetResponsetHeadersAsJson(NancyContext context)
-        {
-            var headers = new JObject();
-            foreach (var item in context.Response.Headers)
-            {
-                JProperty jProperty = new JProperty(item.Key, item.Value);
-                headers.Add(jProperty);
-            }
-            return JsonConvert.SerializeObject(headers, Formatting.Indented);
-        }
-
-        /// <summary>
-        /// Get response as string 
-        /// </summary>
-        /// <param name="context"></param>
-        /// <returns></returns>
-        private string GetResponseAsString(NancyContext context)
-        {
-            var stream = new MemoryStream();
-            context.Response.Contents.Invoke(stream);
-
-            stream.Position = 0;
-            string responseContent = string.Empty;
-            using (var reader = new StreamReader(stream))
-            {
-                responseContent = reader.ReadToEnd();
-            }
-
-            return responseContent;
-        }
-
-        /// <summary>
-        /// Get content length
-        /// </summary>
-        /// <param name="context"></param>
-        /// <returns></returns>
-        private long GetResponseLength(NancyContext context)
-        {
-            var stream = new MemoryStream();
-            context.Response.Contents.Invoke(stream);
-            stream.Position = 0;
-            return stream.Length;
         }
     }
 }

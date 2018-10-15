@@ -33,8 +33,8 @@ protected override void ConfigureApplicationContainer(TinyIoCContainer container
 
 protected override void ApplicationStartup(TinyIoCContainer container, IPipelines pipelines)
 {
-    var logger = container.Resolve<ICommunicationLogger>();
-    logger.ConfigurePipelines(pipelines);
+	// you must setup logger pipeline in application startup
+	pipelines.AddLogPipeline(container); 
 }
 
 ```
@@ -43,21 +43,34 @@ Ready! That way all request/response will be sended to serilog.
 
 You can custom information title / error title and Serilog Logger using NancySerilogConfiguration in constructor. By default, global serilog logger will be used.
 
+You can disable logging on success using DisableSerilogExtension in your action:
+
+```c#
+
+public object Home()
+{
+	this.DisableLogging();
+	...
+}
+
+```
+
 ## Properties 
 
-* `Body`
 * `Method`
 * `Path`
-* `UrlBase`
 * `Host`
+* `Port`
+* `Url`
+* `QueryString`
 * `Query`
 * `RequestHeaders`
 * `Ip`
-* `ProtocolVersion`
 * `IsSuccessful`
 * `StatusCode`
-* `StatusCodeDescription`
+* `StatusDescription`
 * `StatusCodeFamily`
+* `ProtocolVersion`
 * `ErrorException`
 * `ErrorMessage`
 * `Content`
@@ -65,6 +78,7 @@ You can custom information title / error title and Serilog Logger using NancySer
 * `ContentLength`
 * `ResponseHeaders`
 * `ElapsedMilliseconds`
+* `RequestKey`
 
 You can use this propeties with serilog log context to build log messages. `HTTP {Method} {Path} {...}`.
 
