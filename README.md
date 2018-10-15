@@ -57,6 +57,7 @@ public object Home()
 
 ## Properties 
 
+* `RequestBody`
 * `Method`
 * `Path`
 * `Host`
@@ -73,7 +74,7 @@ public object Home()
 * `ProtocolVersion`
 * `ErrorException`
 * `ErrorMessage`
-* `Content`
+* `ResponseContent`
 * `ContentType`
 * `ContentLength`
 * `ResponseHeaders`

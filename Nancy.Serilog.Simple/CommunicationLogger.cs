@@ -70,7 +70,7 @@ namespace Nancy.Serilog.Simple
 
             var statusCode = context.GetStatusCode(exception);
 
-            LogContext.PushProperty("Body", context.GetRequestBody(this.NancySerilogConfiguration.Blacklist));
+            LogContext.PushProperty("RequestBody", context.GetRequestBody(this.NancySerilogConfiguration.Blacklist));
             LogContext.PushProperty("Method", context.Request.Method);
             LogContext.PushProperty("Path", context.Request.Path);
             LogContext.PushProperty("Host", context.Request.Url.HostName);
@@ -87,7 +87,7 @@ namespace Nancy.Serilog.Simple
             LogContext.PushProperty("ProtocolVersion", context.Request.ProtocolVersion);
             LogContext.PushProperty("ErrorException", exception);
             LogContext.PushProperty("ErrorMessage", exception?.Message);
-            LogContext.PushProperty("Content", context.GetResponseContent());
+            LogContext.PushProperty("ResponseContent", context.GetResponseContent());
             LogContext.PushProperty("ContentType", context.Response.ContentType);
             LogContext.PushProperty("ContentLength", context.GetResponseLength());
             LogContext.PushProperty("ResponseHeaders", context.GetResponseHeaders());
