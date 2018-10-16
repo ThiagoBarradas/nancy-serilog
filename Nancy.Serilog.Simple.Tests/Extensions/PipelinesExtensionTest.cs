@@ -2,7 +2,6 @@
 using Nancy.Serilog.Simple.Extensions;
 using Nancy.Serilog.Simple.Tests.Mock;
 using Nancy.TinyIoc;
-using Newtonsoft.Json;
 using PackUtils;
 using System;
 using System.Collections.Generic;
@@ -10,7 +9,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using WebApi.Models.Exceptions;
-using WebApi.Models.Helpers;
 using WebApi.Models.Response;
 using Xunit;
 
@@ -26,10 +24,9 @@ namespace Nancy.Serilog.Simple.Tests.Extensions
         {
             // arrange
             NancyContext context = null;
-            TinyIoCContainer container = new TinyIoCContainer();
 
             // act
-            PipelinesExtension.WriteStopwatchAndRequestKey(context, container);
+            PipelinesExtension.WriteStopwatchAndRequestKey(context);
 
             // assert
             Assert.Null(context);
@@ -40,10 +37,9 @@ namespace Nancy.Serilog.Simple.Tests.Extensions
         {
             // arrange
             NancyContext context = NancyContextMock.Create();
-            TinyIoCContainer container = new TinyIoCContainer();
 
             // act
-            PipelinesExtension.WriteStopwatchAndRequestKey(context, container);
+            PipelinesExtension.WriteStopwatchAndRequestKey(context);
 
             // assert
             Assert.NotNull(context);
@@ -51,7 +47,6 @@ namespace Nancy.Serilog.Simple.Tests.Extensions
             Assert.Equal(2, context.Items.Count);
             Assert.NotNull(context.Items["RequestKey"]);
             Assert.NotNull(context.Items["Stopwatch"]);
-            Assert.Equal(container.Resolve<RequestKey>().Value, context.Items["RequestKey"]);
         }
 
         [Fact]
@@ -61,10 +56,9 @@ namespace Nancy.Serilog.Simple.Tests.Extensions
             NancyContext context = NancyContextMock.Create(
                 requestHeaders: new Dictionary<string, IEnumerable<string>>
                     { { "RequestKey", new string[] { "MyRequestKey" } } });
-            TinyIoCContainer container = new TinyIoCContainer();
 
             // act
-            PipelinesExtension.WriteStopwatchAndRequestKey(context, container);
+            PipelinesExtension.WriteStopwatchAndRequestKey(context);
 
             // assert
             Assert.NotNull(context);
@@ -112,10 +106,9 @@ namespace Nancy.Serilog.Simple.Tests.Extensions
             NancyContext context = NancyContextMock.Create(
                 responseContent: "some response",
                 responseHeaders: new Dictionary<string, string>());
-            TinyIoCContainer container = new TinyIoCContainer();
 
             // act
-            PipelinesExtension.WriteStopwatchAndRequestKey(context, container);
+            PipelinesExtension.WriteStopwatchAndRequestKey(context);
 
             // assert
             Assert.NotNull(context);
@@ -159,7 +152,7 @@ namespace Nancy.Serilog.Simple.Tests.Extensions
             TinyIoCContainer container = new TinyIoCContainer();
 
             // act
-            pipelines.AddStopwatchAndRequestKeyPipelines(container);
+            pipelines.AddStopwatchAndRequestKeyPipelines();
             pipelines.BeforeRequest.Invoke(context, new CancellationToken());
             pipelines.AfterRequest.Invoke(context, new CancellationToken());
             context.Response.Headers.Remove("X-Internal-Time");
