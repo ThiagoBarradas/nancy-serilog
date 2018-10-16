@@ -26,9 +26,10 @@ namespace Nancy.Serilog.Simple.Tests.Extensions
         {
             // arrange
             NancyContext context = null;
+            TinyIoCContainer container = new TinyIoCContainer();
 
             // act
-            PipelinesExtension.WriteStopwatchAndRequestKey(context);
+            PipelinesExtension.WriteStopwatchAndRequestKey(context, container);
 
             // assert
             Assert.Null(context);
@@ -39,9 +40,10 @@ namespace Nancy.Serilog.Simple.Tests.Extensions
         {
             // arrange
             NancyContext context = NancyContextMock.Create();
+            TinyIoCContainer container = new TinyIoCContainer();
 
             // act
-            PipelinesExtension.WriteStopwatchAndRequestKey(context);
+            PipelinesExtension.WriteStopwatchAndRequestKey(context, container);
 
             // assert
             Assert.NotNull(context);
@@ -49,6 +51,7 @@ namespace Nancy.Serilog.Simple.Tests.Extensions
             Assert.Equal(2, context.Items.Count);
             Assert.NotNull(context.Items["RequestKey"]);
             Assert.NotNull(context.Items["Stopwatch"]);
+            Assert.Equal(container.Resolve<RequestKey>().Value, context.Items["RequestKey"]);
         }
 
         [Fact]
@@ -58,9 +61,10 @@ namespace Nancy.Serilog.Simple.Tests.Extensions
             NancyContext context = NancyContextMock.Create(
                 requestHeaders: new Dictionary<string, IEnumerable<string>>
                     { { "RequestKey", new string[] { "MyRequestKey" } } });
+            TinyIoCContainer container = new TinyIoCContainer();
 
             // act
-            PipelinesExtension.WriteStopwatchAndRequestKey(context);
+            PipelinesExtension.WriteStopwatchAndRequestKey(context, container);
 
             // assert
             Assert.NotNull(context);
@@ -102,15 +106,16 @@ namespace Nancy.Serilog.Simple.Tests.Extensions
         }
 
         [Fact]
-        public static void ReadStopwatchAndRequestKey_Should_Not_Returns_Headers_When_Items_Not_Exists()
+        public static void WriteStopwatchAndRequestKey_Should_Not_Returns_Headers_When_Items_Not_Exists()
         {
             // arrange
             NancyContext context = NancyContextMock.Create(
                 responseContent: "some response",
                 responseHeaders: new Dictionary<string, string>());
+            TinyIoCContainer container = new TinyIoCContainer();
 
             // act
-            PipelinesExtension.WriteStopwatchAndRequestKey(context);
+            PipelinesExtension.WriteStopwatchAndRequestKey(context, container);
 
             // assert
             Assert.NotNull(context);
@@ -151,9 +156,10 @@ namespace Nancy.Serilog.Simple.Tests.Extensions
                 responseContent: "{ \"test\": 1 }",
                 responseHeaders: new Dictionary<string, string>
                     { { "Content-Type", "application/json" } });
+            TinyIoCContainer container = new TinyIoCContainer();
 
             // act
-            pipelines.AddStopwatchAndRequestKeyPipelines();
+            pipelines.AddStopwatchAndRequestKeyPipelines(container);
             pipelines.BeforeRequest.Invoke(context, new CancellationToken());
             pipelines.AfterRequest.Invoke(context, new CancellationToken());
             context.Response.Headers.Remove("X-Internal-Time");

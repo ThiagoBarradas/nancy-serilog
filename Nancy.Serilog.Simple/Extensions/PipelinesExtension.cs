@@ -33,7 +33,7 @@ namespace Nancy.Serilog.Simple.Extensions
                 throw new ArgumentNullException(nameof(container));
             }
 
-            pipelines.AddStopwatchAndRequestKeyPipelines();
+            pipelines.AddStopwatchAndRequestKeyPipelines(container);
             pipelines.AddHandlerExceptionsPipelines(container);
             pipelines.AddHandlerSuccessfulRequestsPipelines(container);           
         }
@@ -42,10 +42,10 @@ namespace Nancy.Serilog.Simple.Extensions
         /// Add stopwatch and add request key
         /// </summary>
         /// <param name="pipelines"></param>
-        internal static void AddStopwatchAndRequestKeyPipelines(this IPipelines pipelines)
+        internal static void AddStopwatchAndRequestKeyPipelines(this IPipelines pipelines, TinyIoCContainer container)
         {
             pipelines.BeforeRequest.AddItemToStartOfPipeline((context) => 
-                WriteStopwatchAndRequestKey(context));
+                WriteStopwatchAndRequestKey(context, container));
 
             pipelines.AfterRequest.AddItemToStartOfPipeline(context =>
                 ReadStopwatchAndRequestKey(context));
@@ -59,7 +59,7 @@ namespace Nancy.Serilog.Simple.Extensions
         /// </summary>
         /// <param name="context"></param>
         /// <returns></returns>
-        internal static Response WriteStopwatchAndRequestKey(NancyContext context)
+        internal static Response WriteStopwatchAndRequestKey(NancyContext context, TinyIoCContainer container)
         {
             if (context != null)
             {
@@ -68,6 +68,8 @@ namespace Nancy.Serilog.Simple.Extensions
                     : Guid.NewGuid().ToString();
 
                 context.Items.Add("Stopwatch", Stopwatch.StartNew());
+
+                container.Register(new RequestKey { Value = context.Items["RequestKey"].ToString() });
             }
 
             return null;
