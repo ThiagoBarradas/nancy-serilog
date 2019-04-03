@@ -107,8 +107,8 @@ namespace Nancy.Serilog.Simple.Extractors
         /// <returns></returns>
         public static object GetExecutionTime(this NancyContext context)
         {
-            string elapsedDefault = "??";
-            string elapsedParsed = "??";
+            long elapsedDefault = -1;
+            string elapsedParsed = "-1";
 
             context?.Response?.Headers?.TryGetValue("X-Internal-Time", out elapsedParsed);
             if (Int64.TryParse(elapsedParsed, out long elapsedLong) == true)
@@ -165,7 +165,7 @@ namespace Nancy.Serilog.Simple.Extractors
         {
             if (context?.Request == null)
             {
-                return string.Empty;
+                return null;
             }
 
             string body = RequestStream.FromStream(context.Request.Body).AsString();
@@ -186,8 +186,8 @@ namespace Nancy.Serilog.Simple.Extractors
             }
             else
             {
-                return body;
-            }            
+                return new { raw_body = body };
+            }
         }
         
         /// <summary>
@@ -199,7 +199,7 @@ namespace Nancy.Serilog.Simple.Extractors
         {
             if (context?.Response == null)
             {
-                return string.Empty;
+                return null;
             }
 
             var stream = new MemoryStream();
@@ -211,15 +211,17 @@ namespace Nancy.Serilog.Simple.Extractors
             {
                 responseContent = reader.ReadToEnd();
             }
+            stream.Dispose();
 
             if (context.Response.ContentType.Contains("json") == true &&
                 string.IsNullOrWhiteSpace(responseContent) == false)
             {
                 return GetContentAsObjectByContentTypeJson(responseContent, false, null);
             }
-
-            stream.Dispose();
-            return responseContent;
+            else
+            {
+                return new { raw_content = responseContent };
+            }
         }
 
         /// <summary>

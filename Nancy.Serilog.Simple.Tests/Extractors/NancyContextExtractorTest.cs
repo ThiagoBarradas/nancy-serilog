@@ -2,7 +2,6 @@
 using Nancy.Serilog.Simple.Tests.Mock;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Xunit;
 
 namespace Nancy.Serilog.Simple.Tests.Extractors
@@ -344,7 +343,7 @@ namespace Nancy.Serilog.Simple.Tests.Extractors
             var time = context.GetExecutionTime();
 
             // assert
-            Assert.Equal("??", time);
+            Assert.Equal(-1, Convert.ToInt32(time));
         }
 
         [Fact]
@@ -357,7 +356,7 @@ namespace Nancy.Serilog.Simple.Tests.Extractors
             var time = context.GetExecutionTime();
 
             // assert
-            Assert.Equal("??", time);
+            Assert.Equal(-1, Convert.ToInt32(time));
         }
 
         [Fact]
@@ -370,7 +369,7 @@ namespace Nancy.Serilog.Simple.Tests.Extractors
             var time = context.GetExecutionTime();
 
             // assert
-            Assert.Equal("??", time);
+            Assert.Equal(-1, Convert.ToInt32(time));
         }
 
         [Fact]
@@ -387,7 +386,7 @@ namespace Nancy.Serilog.Simple.Tests.Extractors
             var time = context.GetExecutionTime();
 
             // assert
-            Assert.Equal("??", time);
+            Assert.Equal(-1, Convert.ToInt32(time));
         }
 
         [Fact]
@@ -404,7 +403,7 @@ namespace Nancy.Serilog.Simple.Tests.Extractors
             var time = context.GetExecutionTime();
 
             // assert
-            Assert.Equal("??", time);
+            Assert.Equal(-1, Convert.ToInt32(time));
         }
 
         [Fact]
@@ -626,7 +625,7 @@ namespace Nancy.Serilog.Simple.Tests.Extractors
         }
 
         [Fact]
-        public static void GetResponseContent_Should_Return_Empty_When_Context_Is_Null()
+        public static void GetResponseContent_Should_Return_Null_When_Context_Is_Null()
         {
             // arrange
             NancyContext context = null;
@@ -635,11 +634,11 @@ namespace Nancy.Serilog.Simple.Tests.Extractors
             var content = context.GetResponseContent();
 
             // assert
-            Assert.Equal("", content);
+            Assert.Null(content);
         }
 
         [Fact]
-        public static void GetResponseContent_Should_Return_Empty_When_Context_Response_Is_Null()
+        public static void GetResponseContent_Should_Return_Null_When_Context_Response_Is_Null()
         {
             // arrange
             NancyContext context = new NancyContext();
@@ -648,7 +647,7 @@ namespace Nancy.Serilog.Simple.Tests.Extractors
             var content = context.GetResponseContent();
 
             // assert
-            Assert.Equal("", content);
+            Assert.Null(content);
         }
 
         [Fact]
@@ -661,10 +660,10 @@ namespace Nancy.Serilog.Simple.Tests.Extractors
                 { { "Content-Type", "text/plain"} });
 
             // act
-            var content = context.GetResponseContent();
+            dynamic content = context.GetResponseContent();
 
             // assert
-            Assert.Equal("", content);
+            Assert.Empty(content.raw_content);
         }
 
         [Fact]
@@ -677,10 +676,10 @@ namespace Nancy.Serilog.Simple.Tests.Extractors
                 { { "Content-Type", "text/plain"} });
 
             // act
-            var content = context.GetResponseContent();
+            dynamic content = context.GetResponseContent();
 
             // assert
-            Assert.Equal("0123456789", content);
+            Assert.Equal("0123456789", content.raw_content);
         }
 
         [Fact]
@@ -719,7 +718,7 @@ namespace Nancy.Serilog.Simple.Tests.Extractors
         }
        
         [Fact]
-        public static void GetRequestBody_Should_Return_Empty_When_Context_Is_Null_Without_Blacklist()
+        public static void GetRequestBody_Should_Return_Null_When_Context_Is_Null_Without_Blacklist()
         {
             // arrange
             NancyContext context = null;
@@ -728,11 +727,11 @@ namespace Nancy.Serilog.Simple.Tests.Extractors
             var body = context.GetRequestBody(null);
 
             // assert
-            Assert.Equal("", body);
+            Assert.Null(body);
         }
 
         [Fact]
-        public static void GetRequestBody_Should_Return_Empty_When_Context_Response_Is_Null_Without_Blacklist()
+        public static void GetRequestBody_Should_Return_Null_When_Context_Response_Is_Null_Without_Blacklist()
         {
             // arrange
             NancyContext context = new NancyContext();
@@ -741,7 +740,7 @@ namespace Nancy.Serilog.Simple.Tests.Extractors
             var body = context.GetRequestBody(null);
 
             // assert
-            Assert.Equal("", body);
+            Assert.Null(body);
         }
 
         [Fact]
@@ -754,10 +753,10 @@ namespace Nancy.Serilog.Simple.Tests.Extractors
                 { { "Content-Type", new string[] { "text/plain" } } });
 
             // act
-            var body = context.GetRequestBody(null);
+            dynamic body = context.GetRequestBody(null);
 
             // assert
-            Assert.Equal("", body);
+            Assert.Empty(body.raw_body);
         }
 
         [Fact]
@@ -768,10 +767,10 @@ namespace Nancy.Serilog.Simple.Tests.Extractors
                 requestBody: "0123456789");
 
             // act
-            var body = context.GetRequestBody(new string[] { });
+            dynamic body = context.GetRequestBody(new string[] { });
 
             // assert
-            Assert.Equal("0123456789", body);
+            Assert.Equal("0123456789", body.raw_body);
         }
 
         [Fact]

@@ -1,4 +1,3 @@
-using Moq;
 using Nancy.Bootstrapper;
 using Nancy.Serilog.Simple.Extensions;
 using Nancy.Serilog.Simple.Tests.Mock;
@@ -248,7 +247,7 @@ namespace Nancy.Serilog.Simple.Tests
             logger.LogData(context);
 
             // assert
-            Assert.Contains("[Information] \"POST\" | \"localhost\" | \"/test\" | \"127.0.0.1\" | False | \"1.1\" | 400 | \"BadRequest\" | \"4XX\" | \"??\"", this.TestOutputHelper.Output);
+            Assert.Contains("[Information] \"POST\" | \"localhost\" | \"/test\" | \"127.0.0.1\" | False | \"1.1\" | 400 | \"BadRequest\" | \"4XX\" | -1", this.TestOutputHelper.Output);
         }
 
         [Fact]
@@ -290,7 +289,7 @@ namespace Nancy.Serilog.Simple.Tests
             logger.LogData(context);
 
             // assert
-            Assert.Contains("[Information] HTTP \"POST\" \"/test\" from \"127.0.0.1\" responded 400 in \"??\" ms", this.TestOutputHelper.Output);
+            Assert.Contains("[Information] HTTP \"POST\" \"/test\" from \"127.0.0.1\" responded 400 in -1 ms", this.TestOutputHelper.Output);
         }
 
         [Fact]
@@ -333,7 +332,7 @@ namespace Nancy.Serilog.Simple.Tests
             logger.LogData(context, exception);
 
             // assert
-            Assert.Contains("[Error] \"POST\" | \"??\" | 500 | \"5XX\" | \"??\"", this.TestOutputHelper.Output);
+            Assert.Contains("[Error] \"POST\" | \"??\" | 500 | \"5XX\" | -1", this.TestOutputHelper.Output);
         }
 
         [Fact]
@@ -372,7 +371,7 @@ namespace Nancy.Serilog.Simple.Tests
             logger.LogData(context, exception);
 
             // assert
-            Assert.Contains("[Error] HTTP \"POST\" \"/test\" from \"??\" responded 500 in \"??\" ms", this.TestOutputHelper.Output);
+            Assert.Contains("[Error] HTTP \"POST\" \"/test\" from \"??\" responded 500 in -1 ms", this.TestOutputHelper.Output);
         }
 
         [Fact]
