@@ -663,7 +663,7 @@ namespace Nancy.Serilog.Simple.Tests.Extractors
             dynamic content = context.GetResponseContent();
 
             // assert
-            Assert.Empty(content.raw_content);
+            Assert.Empty(content["raw_content"]);
         }
 
         [Fact]
@@ -679,7 +679,7 @@ namespace Nancy.Serilog.Simple.Tests.Extractors
             dynamic content = context.GetResponseContent();
 
             // assert
-            Assert.Equal("0123456789", content.raw_content);
+            Assert.Equal("0123456789", content["raw_content"]);
         }
 
         [Fact]
@@ -756,7 +756,7 @@ namespace Nancy.Serilog.Simple.Tests.Extractors
             dynamic body = context.GetRequestBody(null);
 
             // assert
-            Assert.Empty(body.raw_body);
+            Assert.Empty(body["raw_body"]);
         }
 
         [Fact]
@@ -770,7 +770,7 @@ namespace Nancy.Serilog.Simple.Tests.Extractors
             dynamic body = context.GetRequestBody(new string[] { });
 
             // assert
-            Assert.Equal("0123456789", body.raw_body);
+            Assert.Equal("0123456789", body["raw_body"]);
         }
 
         [Fact]

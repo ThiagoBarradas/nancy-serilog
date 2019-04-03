@@ -186,7 +186,7 @@ namespace Nancy.Serilog.Simple.Extractors
             }
             else
             {
-                return new { raw_body = body };
+                return new Dictionary<string, string> { { "raw_body", body } };
             }
         }
         
@@ -220,7 +220,7 @@ namespace Nancy.Serilog.Simple.Extractors
             }
             else
             {
-                return new { raw_content = responseContent };
+                return new Dictionary<string, string> { { "raw_content", responseContent } };
             }
         }
 
