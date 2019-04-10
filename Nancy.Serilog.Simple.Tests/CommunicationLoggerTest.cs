@@ -21,7 +21,7 @@ namespace Nancy.Serilog.Simple.Tests
         public CommunicationLoggerTest(ITestOutputHelper testOutputHelper)
         {
             this.TestOutputHelper = testOutputHelper as TestOutputHelper;
-
+            
             Log.Logger = new LoggerConfiguration()
                 .Enrich.FromLogContext()
                 .Enrich.WithEnvironmentUserName()
