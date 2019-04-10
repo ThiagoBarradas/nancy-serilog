@@ -127,6 +127,7 @@ namespace Nancy.Serilog.Simple.Tests.Extensions
 
             context.Items.Add("Stopwatch", Stopwatch.StartNew());
             context.Items.Add("RequestKey", "1234567890");
+            context.Items.Add("AccountId", "SomeId");
 
             // act
             PipelinesExtension.ReadStopwatchAndRequestKey(context);
@@ -135,9 +136,11 @@ namespace Nancy.Serilog.Simple.Tests.Extensions
             Assert.NotNull(context);
             Assert.NotNull(context.Response);
             Assert.True(context.Response.Headers.ContainsKey("RequestKey"));
+            Assert.True(context.Response.Headers.ContainsKey("AccountId"));
             Assert.True(context.Response.Headers.ContainsKey("X-Internal-Time"));
             Assert.True(int.Parse(context.Response.Headers["X-Internal-Time"]) >= 0);
-            Assert.Equal("1234567890",context.Response.Headers["RequestKey"]);
+            Assert.Equal("1234567890", context.Response.Headers["RequestKey"]);
+            Assert.Equal("SomeId", context.Response.Headers["AccountId"]);
         }
 
         [Fact]

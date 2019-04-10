@@ -97,10 +97,15 @@ namespace Nancy.Serilog.Simple.Extensions
             }
 
             context.Items.TryGetValue("RequestKey", out object objRequestKey);
-
             if (objRequestKey != null)
             {
                 response.Headers.Add("RequestKey", objRequestKey.ToString());
+            }
+
+            context.Items.TryGetValue("AccountId", out object objAccountId);
+            if (objAccountId != null)
+            {
+                response.Headers.Add("AccountId", objAccountId.ToString());
             }
 
             context.Response = response;
