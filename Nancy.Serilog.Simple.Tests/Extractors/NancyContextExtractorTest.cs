@@ -497,6 +497,79 @@ namespace Nancy.Serilog.Simple.Tests.Extractors
         }
 
         [Fact]
+        public static void GetAccountId_Should_Return_Null_When_Context_Is_Null()
+        {
+            // arrange
+            NancyContext context = null;
+
+            // act
+            var accountId = context.GetAccountId();
+
+            // assert
+            Assert.Null(accountId);
+        }
+
+        [Fact]
+        public static void GetAccountId_Should_Return_Null_When_Context_Request_Is_Null()
+        {
+            // arrange
+            NancyContext context = new NancyContext();
+
+            // act
+            var accountId = context.GetAccountId();
+
+            // assert
+            Assert.Null(accountId);
+        }
+
+        [Fact]
+        public static void GetAccountId_Should_Return_Null_When_Context_Request_Headers_Is_Empty()
+        {
+            // arrange
+            NancyContext context = NancyContextMock.Create(requestHeaders: null);
+
+            // act
+            var accountId = context.GetAccountId();
+
+            // assert
+            Assert.Null(accountId);
+        }
+
+        [Fact]
+        public static void GetAccountId_Should_Return_Null_When_Context_Request_Headers_Not_Contains_AccountId()
+        {
+            // arrange
+            NancyContext context = NancyContextMock.Create(
+                responseHeaders: new Dictionary<string, string>
+                {
+                    { "OtherId", "b2f6759b-50fa-b7c3-7955-4fee4693482e" }
+                });
+
+            // act
+            var accountId = context.GetAccountId();
+
+            // assert
+            Assert.Null(accountId);
+        }
+
+        [Fact]
+        public static void GetAccountId_Should_Return_AccountId_Value()
+        {
+            // arrange
+            NancyContext context = NancyContextMock.Create(
+                responseHeaders: new Dictionary<string, string>
+                {
+                    { "AccountId", "b2f6759b-50fa-b7c3-7955-4fee4693482e" }
+                });
+
+            // act
+            var accountId = context.GetAccountId();
+
+            // assert
+            Assert.Equal("b2f6759b-50fa-b7c3-7955-4fee4693482e", accountId);
+        }
+
+        [Fact]
         public static void GetIp_Should_Return_Default_When_Context_Is_Null()
         {
             // arrange

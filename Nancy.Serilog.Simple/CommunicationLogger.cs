@@ -93,6 +93,7 @@ namespace Nancy.Serilog.Simple
             LogContext.PushProperty("ResponseHeaders", context.GetResponseHeaders());
             LogContext.PushProperty("ElapsedMilliseconds", context.GetExecutionTime());
             LogContext.PushProperty("RequestKey", context.GetRequestKey());
+            LogContext.PushProperty("AccountId", context.GetAccountId());
 
             if (exception != null || statusCode >= 500)
             {
