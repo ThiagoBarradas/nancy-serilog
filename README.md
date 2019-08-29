@@ -62,6 +62,18 @@ public object Home()
 
 ```
 
+Additional Property
+
+```
+context.Items["NancySerilogAdditionalInfo"] = new AdditionalInfo
+{
+    Data = new Dictionary<string, object>
+    {
+        { "SomeProperty", "HERE_SOMEPROPERTY" }
+    }
+};
+```
+
 ## Properties 
 
 * `RequestBody`
