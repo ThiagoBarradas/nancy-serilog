@@ -199,6 +199,76 @@ namespace Nancy.Serilog.Simple.Tests
         }
 
         [Fact]
+        public void LogData_Should_Work_With_Null_AdditionalInfo()
+        {
+            // arrange
+            var requestHeaders = new Dictionary<string, IEnumerable<string>>
+            {
+                {  "X-Forwarded-For", new string[] { "226.225.223.224" } },
+                {  "Content-Type", new string[] { "application/json" } },
+                {  "Accept", new string[] { "application/json", "text/xml" } }
+            };
+            var responseHeaders = new Dictionary<string, string>
+            {
+                {  "Content-Type", "application/json" },
+                {  "X-Internal-Time", "100" }
+            };
+            var context = NancyContextMock.Create("GET", responseHeaders: responseHeaders, requestHeaders: requestHeaders);
+
+            context.Items["NancySerilogAdditionalInfo"] = null;
+
+            var config = new NancySerilogConfiguration
+            {
+                InformationTitle = "{SomeProperty} test additional null"
+            };
+            var logger = new CommunicationLogger(config);
+
+            // act
+            logger.LogData(context);
+
+            // assert
+            Assert.Contains("{SomeProperty} test additional null", this.TestOutputHelper.Output);
+        }
+
+        [Fact]
+        public void LogData_Should_Work_With_AdditionalInfo()
+        {
+            // arrange
+            var requestHeaders = new Dictionary<string, IEnumerable<string>>
+            {
+                {  "X-Forwarded-For", new string[] { "226.225.223.224" } },
+                {  "Content-Type", new string[] { "application/json" } },
+                {  "Accept", new string[] { "application/json", "text/xml" } }
+            };
+            var responseHeaders = new Dictionary<string, string>
+            {
+                {  "Content-Type", "application/json" },
+                {  "X-Internal-Time", "100" }
+            };
+            var context = NancyContextMock.Create("GET", responseHeaders: responseHeaders, requestHeaders: requestHeaders);
+
+            context.Items["NancySerilogAdditionalInfo"] = new AdditionalInfo
+            {
+                Data = new Dictionary<string, object>
+                {
+                    { "SomeProperty", "HERE_SOMEPROPERTY" }
+                }
+            };
+
+            var config = new NancySerilogConfiguration
+            {
+                InformationTitle = "{SomeProperty} test additional data"
+            };
+            var logger = new CommunicationLogger(config);
+
+            // act
+            logger.LogData(context);
+
+            // assert
+            Assert.Contains("\"HERE_SOMEPROPERTY\" test additional data", this.TestOutputHelper.Output);
+        }
+
+        [Fact]
         public void LogData_Should_Work_With_Blacklist_And_Information()
         {
             // arrange

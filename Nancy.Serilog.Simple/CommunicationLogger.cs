@@ -1,6 +1,5 @@
 ﻿using Nancy.Serilog.Simple.Extensions;
 using Nancy.Serilog.Simple.Extractors;
-using Nancy.TinyIoc;
 using Serilog;
 using Serilog.Context;
 using System;
@@ -93,7 +92,21 @@ namespace Nancy.Serilog.Simple
             LogContext.PushProperty("ResponseHeaders", context.GetResponseHeaders());
             LogContext.PushProperty("ElapsedMilliseconds", context.GetExecutionTime());
             LogContext.PushProperty("RequestKey", context.GetRequestKey());
-            LogContext.PushProperty("AccountId", context.GetAccountId());
+
+            if (context.Items.ContainsKey("NancySerilogAdditionalInfo"))
+            {
+                var additionalInfo = (AdditionalInfo) context.Items["NancySerilogAdditionalInfo"];
+
+                if (additionalInfo?.Data != null)
+                {
+                    foreach (var item in additionalInfo.Data)
+                    {
+                        LogContext.PushProperty(item.Key, item.Value);
+                    }
+                }
+            }
+
+            
 
             if (exception != null || statusCode >= 500)
             {

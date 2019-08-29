@@ -135,21 +135,6 @@ namespace Nancy.Serilog.Simple.Extractors
         }
 
         /// <summary>
-        /// Get request key from AccountId Header
-        /// </summary>
-        /// <param name="context"></param>
-        /// <returns></returns>
-        public static string GetAccountId(this NancyContext context)
-        {
-            if (context?.Response?.Headers?.ContainsKey("AccountId") == true)
-            {
-                return context.Response.Headers["AccountId"];
-            }
-
-            return null;
-        }
-
-        /// <summary>
         /// Get ip (X-Forwarded-For or original)
         /// </summary>
         /// <param name="context"></param>
