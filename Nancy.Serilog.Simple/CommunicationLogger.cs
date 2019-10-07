@@ -92,6 +92,7 @@ namespace Nancy.Serilog.Simple
             LogContext.PushProperty("ResponseHeaders", context.GetResponseHeaders());
             LogContext.PushProperty("ElapsedMilliseconds", context.GetExecutionTime());
             LogContext.PushProperty("RequestKey", context.GetRequestKey());
+            LogContext.PushProperty("Environment", Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT"));
 
             if (context.Items.ContainsKey("NancySerilogAdditionalInfo"))
             {
