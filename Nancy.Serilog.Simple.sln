@@ -1,22 +1,32 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27703.2026
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30011.22
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nancy.Serilog.Simple", "Nancy.Serilog.Simple\Nancy.Serilog.Simple.csproj", "{86B6EA2E-A392-4EE5-9B0A-5D0613BD5EEB}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nancy.Serilog.Simple.Tests", "Nancy.Serilog.Simple.Tests\Nancy.Serilog.Simple.Tests.csproj", "{19CC86E9-6988-4192-A935-90B4DC12CD83}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solutiom Items", "Solutiom Items", "{EB79A226-EDC7-455E-8382-B9546B988ECB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "git", "git", "{97362D34-68D7-44E3-A098-27E2574BBE95}"
 	ProjectSection(SolutionItems) = preProject
 		.gitattributes = .gitattributes
 		.gitignore = .gitignore
-		appveyor.yml = appveyor.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "github", "github", "{6BE3EBAE-95F5-499B-B2F8-E0C5ADA390F1}"
+	ProjectSection(SolutionItems) = preProject
 		.github\CONTRIBUTING.md = .github\CONTRIBUTING.md
 		.github\ISSUE_TEMPLATE.md = .github\ISSUE_TEMPLATE.md
 		LICENSE = LICENSE
 		.github\PULL_REQUEST_TEMPLATE.md = .github\PULL_REQUEST_TEMPLATE.md
 		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "devops", "devops", "{61057250-E0D4-4E42-845E-2285D0FE9BC6}"
+	ProjectSection(SolutionItems) = preProject
+		azure-pipelines.yml = azure-pipelines.yml
 	EndProjectSection
 EndProject
 Global
@@ -36,6 +46,11 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{97362D34-68D7-44E3-A098-27E2574BBE95} = {EB79A226-EDC7-455E-8382-B9546B988ECB}
+		{6BE3EBAE-95F5-499B-B2F8-E0C5ADA390F1} = {EB79A226-EDC7-455E-8382-B9546B988ECB}
+		{61057250-E0D4-4E42-845E-2285D0FE9BC6} = {EB79A226-EDC7-455E-8382-B9546B988ECB}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2A2EB7D9-A885-4283-864B-5CE0B2DB6A98}
