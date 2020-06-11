@@ -109,7 +109,7 @@ namespace Nancy.Serilog.Simple.Tests
                 logger.LogData(null));
 
             // assert
-            Assert.Equal("Value cannot be null.\r\nParameter name: context", ex.Message);
+            Assert.Equal("Value cannot be null.Parameter name: context", ex.Message.Replace("\r", "").Replace("\n", ""));
         }
 
         [Fact]
