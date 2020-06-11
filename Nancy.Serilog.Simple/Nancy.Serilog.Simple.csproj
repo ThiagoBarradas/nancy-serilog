@@ -11,8 +11,8 @@
     <RepositoryUrl>https://github.com/thiagobarradas/nancy-serilog</RepositoryUrl>
     <Description>Serilog logger for Nancy web applications. Handler request, response and exceptions.</Description>
     <Copyright>Ⓒ Thiago Barradas</Copyright>
-    <PackageId>Nancy.Serilog</PackageId>
-    <Product>Nancy.Serilog</Product>
+    <PackageId>Nancy.Serilog.Simple</PackageId>
+    <Product>Nancy.Serilog.Simple</Product>
   </PropertyGroup>
 
   <ItemGroup>

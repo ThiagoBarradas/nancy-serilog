@@ -8,7 +8,7 @@
 
 variables:
   solution_path: 'Nancy.Serilog.Simple.sln'
-  sdk_project_name: 'Nancy.Serilog'
+  sdk_project_name: 'Nancy.Serilog.Simple'
   sdk_project_path: 'Nancy.Serilog.Simple/Nancy.Serilog.Simple.csproj'
   net_version: 'netstandard2.0'
   execute_test: 'true'
