@@ -1,8 +1,8 @@
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/1ea91387fdc649518b8cf09f822268c9)](https://www.codacy.com/app/ThiagoBarradas/nancy-serilog?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=ThiagoBarradas/nancy-serilog&amp;utm_campaign=Badge_Grade)
-[![Build status](https://ci.appveyor.com/api/projects/status/p90493e09f7qe5ou/branch/master?svg=true)](https://ci.appveyor.com/project/ThiagoBarradas/nancy-serilog/branch/master)
-[![codecov](https://codecov.io/gh/ThiagoBarradas/nancy-serilog/branch/master/graph/badge.svg)](https://codecov.io/gh/ThiagoBarradas/nancy-serilog)
+[![Build Status](https://barradas.visualstudio.com/Contributions/_apis/build/status/ThiagoBarradas.nancy-serilog?branchName=master)](https://barradas.visualstudio.com/Contributions/_build/latest?definitionId=11&branchName=master)
 [![NuGet Downloads](https://img.shields.io/nuget/dt/Nancy.Serilog.Simple.svg)](https://www.nuget.org/packages/Nancy.Serilog.Simple/)
 [![NuGet Version](https://img.shields.io/nuget/v/Nancy.Serilog.Simple.svg)](https://www.nuget.org/packages/Nancy.Serilog.Simple/)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=ThiagoBarradas_nancy-serilog&metric=alert_status)](https://sonarcloud.io/dashboard?id=ThiagoBarradas_nancy-serilog)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=ThiagoBarradas_nancy-serilog&metric=coverage)](https://sonarcloud.io/dashboard?id=ThiagoBarradas_nancy-serilog)
 
 # Nancy.Serilog.Simple
 

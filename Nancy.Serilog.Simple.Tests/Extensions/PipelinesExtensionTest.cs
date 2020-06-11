@@ -297,7 +297,7 @@ namespace Nancy.Serilog.Simple.Tests.Extensions
                 pipelines.AddLogPipelines(container));
 
             // assert
-            Assert.Equal("Value cannot be null.\r\nParameter name: pipelines", exception.Message);
+            Assert.Equal("Value cannot be null.Parameter name: pipelines", exception.Message.Replace("\r", "").Replace("\n", ""));
         }
 
         [Fact]
@@ -312,7 +312,7 @@ namespace Nancy.Serilog.Simple.Tests.Extensions
                 pipelines.AddLogPipelines(container));
 
             // assert
-            Assert.Equal("Value cannot be null.\r\nParameter name: container", exception.Message);
+            Assert.Equal("Value cannot be null.Parameter name: container", exception.Message.Replace("\r","").Replace("\n",""));
         }
 
         [Fact]

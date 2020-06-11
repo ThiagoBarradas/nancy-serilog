@@ -69,6 +69,23 @@ namespace Nancy.Serilog.Simple
 
             var statusCode = context.GetStatusCode(exception);
 
+            string exceptionMessage = null;
+            string exceptionStackTrace = null;
+
+            if (exception != null)
+            {
+                exceptionMessage = HandleFieldSize(exception.Message, 256);
+                exceptionStackTrace = HandleFieldSize(exception.StackTrace, 768);
+            }
+
+            object controller = "Unknow";
+            object action = "Unknow";
+            if (context.Items != null) 
+            {
+                context.Items.TryGetValue("Controller", out controller);
+                context.Items.TryGetValue("Action", out action);
+            }
+
             LogContext.PushProperty("RequestBody", context.GetRequestBody(this.NancySerilogConfiguration.Blacklist));
             LogContext.PushProperty("Method", context.Request.Method);
             LogContext.PushProperty("Path", context.Request.Path);
@@ -84,14 +101,17 @@ namespace Nancy.Serilog.Simple
             LogContext.PushProperty("StatusDescription", ((HttpStatusCode)statusCode).ToString());
             LogContext.PushProperty("StatusCodeFamily", context.GetStatusCodeFamily(exception));
             LogContext.PushProperty("ProtocolVersion", context.Request.ProtocolVersion);
-            LogContext.PushProperty("ErrorException", exception);
-            LogContext.PushProperty("ErrorMessage", exception?.Message);
+            LogContext.PushProperty("ErrorException", exceptionStackTrace);
+            LogContext.PushProperty("ErrorMessage", exceptionMessage);
             LogContext.PushProperty("ResponseContent", context.GetResponseContent());
             LogContext.PushProperty("ContentType", context.Response.ContentType);
             LogContext.PushProperty("ContentLength", context.GetResponseLength());
             LogContext.PushProperty("ResponseHeaders", context.GetResponseHeaders());
             LogContext.PushProperty("ElapsedMilliseconds", context.GetExecutionTime());
+            LogContext.PushProperty("Version", this.NancySerilogConfiguration.Version);
             LogContext.PushProperty("RequestKey", context.GetRequestKey());
+            LogContext.PushProperty("Controller", controller?.ToString());
+            LogContext.PushProperty("Operation", action?.ToString());
             LogContext.PushProperty("Environment", Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT"));
 
             if (context.Items.ContainsKey("NancySerilogAdditionalInfo"))
@@ -132,6 +152,34 @@ namespace Nancy.Serilog.Simple
 
             this.NancySerilogConfiguration.Logger =
                 configuration?.Logger ?? Log.Logger;
+        }
+
+        /// <summary>
+        /// Handle field size
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="maxSize"></param>
+        /// <param name="required"></param>
+        /// <param name="defaultValue"></param>
+        /// <returns></returns>
+        private static string HandleFieldSize(string value, int maxSize, bool required = false, string defaultValue = "????")
+        {
+            if (string.IsNullOrWhiteSpace(value) && !required)
+            {
+                return null;
+            }
+
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                value = defaultValue;
+            }
+
+            if (value.Length > maxSize)
+            {
+                return value.Substring(0, maxSize);
+            }
+
+            return value;
         }
     }
 }

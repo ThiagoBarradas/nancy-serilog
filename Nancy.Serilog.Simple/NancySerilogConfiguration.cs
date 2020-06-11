@@ -11,6 +11,8 @@ namespace Nancy.Serilog.Simple
 
         public string ErrorTitle { get; set; }
 
+        public string Version { get; set; }
+
         public ILogger Logger { get; set; }
     }
 }
