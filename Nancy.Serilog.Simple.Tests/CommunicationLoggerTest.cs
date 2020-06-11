@@ -119,7 +119,7 @@ namespace Nancy.Serilog.Simple.Tests
             var originIp = "127.0.0.1";
             var protocolVersion = "1.1";
 
-            var requestMethod = "POST";
+            var requestMethod = "POST"; 
             var requestBody = "{ \"test\" : \"123\" }";
             var requestUrl = "http://localhost/test";
             var requestHeaders = new Dictionary<string, IEnumerable<string>>
