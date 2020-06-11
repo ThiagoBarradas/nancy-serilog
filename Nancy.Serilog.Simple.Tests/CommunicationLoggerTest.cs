@@ -118,7 +118,7 @@ namespace Nancy.Serilog.Simple.Tests
             // arrange
             var originIp = "127.0.0.1";
             var protocolVersion = "1.1";
-
+             
             var requestMethod = "POST"; 
             var requestBody = "{ \"test\" : \"123\" }";
             var requestUrl = "http://localhost/test";
