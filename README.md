@@ -8,6 +8,12 @@
 
 Serilog logger for Nancy web applications. Handler request, response and exceptions.
 
+## Install via NuGet
+
+```
+PM> Install-Package Nancy.Serilog.Simple
+```
+
 # Sample
 
 Configure service in statup
@@ -102,19 +108,23 @@ context.Items["NancySerilogAdditionalInfo"] = new AdditionalInfo
 
 You can use this propeties with serilog log context to build log messages. `HTTP {Method} {Path} {...}`.
 
-## Install via NuGet
+## Setup global max length for exception properties
 
-```
-PM> Install-Package Nancy.Serilog.Simple
-```
+Use env var to change default value
+
+- `SERILOG_ERROR_MESSAGE_MAX_LENGTH` default value 256;
+- `SERILOG_ERROR_EXCEPTION_MAX_LENGTH` default value 1024;
 
 ## How can I contribute?
+
 Please, refer to [CONTRIBUTING](.github/CONTRIBUTING.md)
 
 ## Found something strange or need a new feature?
+
 Open a new Issue following our issue template [ISSUE_TEMPLATE](.github/ISSUE_TEMPLATE.md)
 
 ## Changelog
+
 See in [nuget version history](https://www.nuget.org/packages/Nancy.Serilog.Simple)
 
 ## Did you like it? Please, make a donate :)
